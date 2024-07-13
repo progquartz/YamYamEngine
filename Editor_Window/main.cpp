@@ -102,6 +102,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, 1600, 900, nullptr, nullptr, hInstance, nullptr);
 
+   // 2개의 윈도우도 생성 가능하다.
+   //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   //    CW_USEDEFAULT, 0, 1600, 900, nullptr, nullptr, hInstance, nullptr);
+
    if (!hWnd)
    {
       return FALSE;
@@ -149,6 +153,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+
+            // 이렇게 하면 힙에 메모리 계속 쌓이니까, 메모리 삭제해줘야 함.
+            // 일반적으로 api에서 제공하는 delete사용하면됨.
+            HBRUSH blueBrush = CreateSolidBrush(RGB(0,0,255));
+
+            // 이전 흰색 브러시 저장.
+            HBRUSH whiteBrush = (HBRUSH)SelectObject(hdc, blueBrush);
+
+            Rectangle(hdc, 100,100,200,200);
+
+            // 흰색으로 돌리기.
+            SelectObject(hdc, whiteBrush);
+            // 파랑 브러시 삭제.
+            DeleteObject(blueBrush);
+            
+
+            HPEN redPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
+            HPEN oldPen = (HPEN)SelectObject(hdc, redPen);
+
+            Ellipse(hdc, 100, 100, 200, 200);
+            SelectObject(hdc, oldPen);
+            DeleteObject(redPen);
+            
+            // 하양 브러시 삭제.
+            DeleteObject(whiteBrush);
+
             EndPaint(hWnd, &ps);
         }
         break;
